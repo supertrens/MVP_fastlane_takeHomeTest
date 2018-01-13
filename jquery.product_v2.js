@@ -32,7 +32,7 @@ const schema = {
  * and append it to the API URLto 
  * Be able to get data from API call
  */
-function get() {
+function getID() {
     //read the url from the browser
     const myUrl = $(location).attr('href');
     //get the last part 
@@ -47,28 +47,22 @@ const productID = getID();
 const myUrl = `https://www.ae.com/api/catalog/v1/products/${productID}`;
 
 
-//This is the main function, It will simply  call the apicall function
-function scrapeData() {
-    /************************First make the API call ************************/
-    apiCall();
-}
-
-
 /*I make the ajax request here to fetch the data and distribuate the data to
  * All the other functions throug answerQ3 which is a compound function of 
  * answerQ1 and answerQ2
  */
-function apiCall() {
-
-    const request = $.ajax({
+function scrapeData() {
+    let product = schema;
+    /************************First make the API call ************************/
+    $.ajax({
         url: myUrl,
         type: "GET",
+        success: function(feed) {
+           product = answerQ3(product.product , feed);
+        }
     });
 
-    request.done(function(feed) {
-        answerQ3(feed);
-    });
-
+    return product
 }
 
 /* This function will recieve  two parametes 'product' and 'Json_query'
@@ -84,7 +78,6 @@ function apiCall() {
  * PS) I left the old code in comment(I used dom manipulation at first)
  */
 function answerQ1(product, Json_query) {
-
     //product.title = $("h1.psp-product-name:eq(0)").text().trim();
     product.title = Json_query.prdName;
 
@@ -125,8 +118,7 @@ function answerQ1(product, Json_query) {
         let text = $(this).text().trim()
         product.categories.push(text)
     });
-    console.log(product);
-    return product
+    return product;
 }
 
 
@@ -166,7 +158,8 @@ function answerQ2(product, Json_query) {
 }
 
 
-/* This function will recieve  one parameter ''feed'
+/* This function will recieve  two parameters 'Product' and 'feed'
+ * @product is the product schema that we will modify and send back
  * @feed is the Json data recieved from the API endpoint.
  * The function will call the functions answerQ1 and answerQ2
  * ( Acording to Q3 requirement). And it will modify 
@@ -178,10 +171,9 @@ function answerQ2(product, Json_query) {
  * - product.rating
  * @return product
  */
-function answerQ3(feed) {
+function answerQ3(product , feed) {
 
 
-    let product = schema.product;
     const Json_query = feed.response.value.data;
     /********************HERE IS THE CODE FOR QUESTION 1 ********************/
     product = answerQ1(product, Json_query);
@@ -208,5 +200,5 @@ function answerQ3(feed) {
     product.rating_count = rating_count === "" ? 0 : parseFloat(rating_count)
     product.rating = rating === "" ? 0 : parseFloat(rating)
 
-    return product
+    return product;
 }
