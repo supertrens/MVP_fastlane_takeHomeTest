@@ -1,10 +1,9 @@
 /* Copyright (c) 2018 MVP Fastlane (Take home project) 
  * Programmer: Ernst Pierre(pitrens.studio@gmail.com) http://pieduc.com
  * Version : 0.1
- * Requires: jQuery 1.2+
  */
 
-var schema = {
+const schema = {
     product: {
         availability: "",
         brand: "",
@@ -17,9 +16,9 @@ var schema = {
             list: 0.0,
             sale: 0.0
         },
-        details:{
-            color:"",
-            size :""
+        details: {
+            color: "",
+            size: ""
         },
         rating: 0.0,
         rating_count: 0,
@@ -28,56 +27,83 @@ var schema = {
         variations: []
     }
 }
-
-var myUrl = "https://www.ae.com/api/catalog/v1/products/1164_9216_337";
-
-function scrapeData() {
-   
-    /************************First make the API call ************************/
-
-     apiCall();
-     
+/*
+ * In this function I will getthe product ID from the URL 
+ * and append it to the API URLto 
+ * Be able to get data from API call
+ */
+function get() {
+    //read the url from the browser
+    const myUrl = $(location).attr('href');
+    //get the last part 
+    const lastPart = myUrl.split("/").reverse()[0];
+    //take the prID which is the value before '?'
+    const productID = lastPart.split("?")[0];
+    return productID;
 }
 
+//custom URL
+const productID = getID();
+const myUrl = `https://www.ae.com/api/catalog/v1/products/${productID}`;
+
+
+//This is the main function, It will simply  call the apicall function
+function scrapeData() {
+    /************************First make the API call ************************/
+    apiCall();
+}
+
+
+/*I make the ajax request here to fetch the data and distribuate the data to
+ * All the other functions throug answerQ3 which is a compound function of 
+ * answerQ1 and answerQ2
+ */
 function apiCall() {
-    
-    var request = $.ajax({
-         url: myUrl,
-         type: "GET",
+
+    const request = $.ajax({
+        url: myUrl,
+        type: "GET",
     });
- 
-    request.done(function( feed ) {
+
+    request.done(function(feed) {
         answerQ3(feed);
     });
- 
-    request.fail(function( jqXHR, textStatus ) {
-        console.log("error");
-    });
+
 }
 
-function answerQ1(product , Json_query) {
-    
-    
-    /* for the 'title' I select only the first element, 
-     * otherwise the title will be read twice.
-     * since we have an araia-label that will be added to the object
-     */
+/* This function will recieve  two parametes 'product' and 'Json_query'
+ * @product is the product schema that we will modify and send back
+ * @Json_query is the Json data recieved from the API endpoint.
+ * The function will modify (according to the exercise requirement Q1)
+ * - product.title
+ * - product.price.list
+ * - product.price.sale
+ * - product.description
+ * - product.categories
+ * @return product
+ * PS) I left the old code in comment(I used dom manipulation at first)
+ */
+function answerQ1(product, Json_query) {
+
     //product.title = $("h1.psp-product-name:eq(0)").text().trim();
     product.title = Json_query.prdName;
 
     // let price   = $("#psp-regular-price").text().trim();
-    // //remove any comma from the price string and convert them to float
-    // price = price.replace(/,/g,"");
     // product.price.list = parseFloat(price);
-    product.price.list = parseFloat(Json_query.listPrice);
+
+    let price   = Json_query.convertedListPrice;
+    // //remove any comma from the price string and convert them to float
+    price = price.replace(/,/g,"");
+    product.price.list = parseFloat(price);
 
 
     // let sale    = $("#psp-sale-price").text().trim();    
-    // sale  = sale.replace(/,/g,"");
-    // //check if the sale variable as a value before convert it to float
-    // product.price.sale = sale === "" ? "" : parseFloat(sale);
-    product.price.sale = parseFloat(Json_query.salePrice);
-   
+    
+    let sale = Json_query.convertedSalePrice;
+    sale  = sale.replace(/,/g,"");
+    //check if the sale variable as a value before convert it to float
+    product.price.sale = sale === "" ? "" : parseFloat(sale);
+
 
     // product.description = $(".pdp-about-details-equit").text().trim();
     // // get more details 
@@ -90,8 +116,8 @@ function answerQ1(product , Json_query) {
     product.description = Json_query.leadingEquity;
 
     //add extra information
-    let extraDetail = Json_query.equityBullets;
-    for(let detail of extraDetail)
+    const extraDetail = Json_query.equityBullets;
+    for (let detail of extraDetail)
         product.description = `${product.description} ${detail} `;
 
     //product.categories =
@@ -103,48 +129,66 @@ function answerQ1(product , Json_query) {
     return product
 }
 
-function answerQ2(product , Json_query) {
-    $('#psp-sizedropdown-menu li').each(function( count) {
 
-        let id = Json_query.prdID;
-        let outOfStock =$(this).attr("data-outofstock").toLowerCase();
-        
-       
-        //to take the first in the list as the active li
-        if(count === 0){
-            const size = $("#psp-sizedropdown-menu li:eq(0) a").attr("data-size");
-            product.product_id = id;
-            product.details.size=size;
-        }
+/* This function will recieve  two parametes 'product' and 'Json_query'
+ * @product is the product schema that we will modify and send back
+ * @Json_query is the Json data recieved from the API endpoint.
+ * The function will modify (according to the exercise requirement Q2)
+ * - product.product_id
+ * - product.availability
+ * - product.details.color
+ * - product.details.size
+ * - product.variations
+ * @return product
+ */
+function answerQ2(product, Json_query) {
+
+    const activePoductQuery = Json_query.colorImageSelectionData['001'];
+
+    product.product_id = Json_query.prdId;
+    product.availability = Json_query.isAvailable;
+
+    // product.details.color=$(".psp-product-color").text().trim();
+    product.details.color = activePoductQuery.colorName;
+    product.details.size = activePoductQuery.sizedd[0].sizeName;
 
 
-        // If outOfStock is true , so the product is not available
-        const availability = outOfStock === "true" ? false : true
-
-        product.availability = availability
-        
+    //Get the variation of the product
+    const sizes = activePoductQuery.sizedd;
+    for (size of sizes)
         product.variations.push({
-            "id": id,
-            "availability": availability
-        })
-        product.details.color=$(".psp-product-color").text().trim()
-       
-    })
-    return product
+            "id": size.tenDigitSkuId,
+            "sizeName": size.sizeName,
+            "availability": size.isAvailable
+        });
+
+    return product;
 }
 
 
+/* This function will recieve  one parameter ''feed'
+ * @feed is the Json data recieved from the API endpoint.
+ * The function will call the functions answerQ1 and answerQ2
+ * ( Acording to Q3 requirement). And it will modify 
+ * - product.currency 
+ * - product.brand 
+ * - product.image_url
+ * - product.product.url 
+ * - product.rating_count
+ * - product.rating
+ * @return product
+ */
 function answerQ3(feed) {
 
-    console.log(feed);
+
     let product = schema.product;
     const Json_query = feed.response.value.data;
     /********************HERE IS THE CODE FOR QUESTION 1 ********************/
-    product = answerQ1(product , Json_query);
+    product = answerQ1(product, Json_query);
 
     /********************HERE IS THE CODE FOR QUESTION 2 ********************/
-   // Q2-1
-    product = answerQ2(product , Json_query);
+    // Q2-1
+    product = answerQ2(product, Json_query);
 
     //Complete the Json data
     // product.currency = $(".psp-product-regularprice , .psp-product-listprice").attr("content")
@@ -161,10 +205,8 @@ function answerQ3(feed) {
     const rating = $(".BVRRRatingNumber").text().trim()
     //the rating and the rating_count might be undefined if no review had been added
     //so we check, if it's a number we display it , else we set them as 0
-    product.rating_count = rating_count ==="" ? 0 : parseFloat(rating_count)
-    product.rating =  rating ==="" ? 0 : parseFloat(rating)
+    product.rating_count = rating_count === "" ? 0 : parseFloat(rating_count)
+    product.rating = rating === "" ? 0 : parseFloat(rating)
 
     return product
 }
-
-
