@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
-import Header from '../components/header'
+import Hero from '../components/hero'
+import Services from '../components/services'
 import '../sass/main.scss'
 
 const TemplateWrapper = ({ children }) => (
@@ -14,8 +15,10 @@ const TemplateWrapper = ({ children }) => (
         { name: 'keywords', content: 'sample, something' },
       ]}
     />
-    <Header />
-    <div
+    <Hero />
+    <Services />
+    
+    {/* <div
       style={{
         margin: '0 auto',
         maxWidth: 960,
@@ -24,7 +27,7 @@ const TemplateWrapper = ({ children }) => (
       }}
     >
       {children()}
-    </div>
+    </div> */}
   </div>
 )
 

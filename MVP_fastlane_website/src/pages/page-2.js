@@ -2,23 +2,9 @@ import React from 'react'
 import Link from 'gatsby-link'
 
 const SecondPage = () => (
-  <section className="grid-test">
-    <div className="row">
-      <div className="col-1-of-2"> ol-1-of-2</div>
-      <div className="col-1-of-2"> ol-1-of-2</div>
-    </div>
-
-    <div className="row">
-      <div className="col-1-of-3"> ol-1-of-3</div>
-      <div className="col-1-of-3"> ol-1-of-3</div>
-      <div className="col-1-of-3"> ol-1-of-3</div>
-    </div>
-
-    <div className="row">
-      <div className="col-1-of-3"> ol-1-of-3</div>
-      <div className="col-2-of-3"> ol-3-of-3</div>
-    </div>
-  </section>
+  
+   <div></div>
+ 
   // <section className="grid-test">
   //   <h1>MVP Fastlane</h1>
   //       <h2>Our Team</h2>
