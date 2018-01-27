@@ -1,5 +1,25 @@
-.section-about{
+.section-services{
     background: $color-grey-light-1;
     padding: 25rem 0;
     margin-top: -15vh;
+}
+
+.section-heros{
+    
+     background-image: linear-gradient(
+      to bottom right,
+      rgba($color-primary-light, 0.8),
+      rgba($color-primary-dark, 0.8)
+    ),
+    url(../img/main.jpg);
+    background-size: cover;
+    padding: 20rem 0;
+    //skew the box
+    transform: skewY(-7deg);
+    margin-top: -10rem;
+    // skew the heroes back as direct child of section-heroes
+    & > *{
+           
+    transform: skewY(7deg);
+    }
 }

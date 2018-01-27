@@ -3,7 +3,7 @@ import Link   from 'gatsby-link'
 import logo from "../img/logo.png";
 
 
-const Hero = () => (
+const LandingPage = () => (
   <header className="header">
     <div className="header__logo-box">
       <img src={logo} alt="MVP Fastlane Logo" className="header__logo" />
@@ -21,4 +21,4 @@ const Hero = () => (
   </header>
 );
 
-export default Hero
+export default LandingPage

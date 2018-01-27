@@ -33,10 +33,10 @@ body {
     animation: moveInRight 1s ease-out;
   }
 }
-.heading-secondary{
-  display: inline-block;
+.heading-secondary{  
   font-size: 3.5rem;
   text-transform: uppercase;
+  display: inline-block;
   background-image: linear-gradient(
     to right,
     $color-primary-light,
