@@ -1,0 +1,35 @@
+
+body {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  // font-size: 1.6rem;
+  line-height: 1.7;
+  color: $color-grey-dark;
+  padding: 3rem;
+}
+
+
+
+.heading-primary {
+  color: $color-white;
+  text-transform: uppercase;
+  margin-bottom: 6rem;
+  // no one know why this work to avoid shaking
+  backface-visibility: hidden;
+
+  //.heading-primary--main
+  &--main {
+    display: block;
+    font-size: 6rem;
+    letter-spacing: 2.5rem;
+    animation: moveInLeft 1s ease-out;
+  }
+  //   .heading-primary--sub
+  &--sub {
+    display: block;
+    font-size: 3rem;
+    letter-spacing: 1.5rem;
+    text-align: center;
+    color: yellow;
+    animation: moveInRight 1s ease-out;
+  }
+}
