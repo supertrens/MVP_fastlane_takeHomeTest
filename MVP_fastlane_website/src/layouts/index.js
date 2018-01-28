@@ -5,6 +5,7 @@ import Helmet from 'react-helmet'
 import Heros from '../components/heros'
 import LandingPage from '../components/landing_page'
 import Services from '../components/services'
+import Teams from '../components/teams'
 import '../sass/main.scss';
 import '../css/icon-font.css';
 
@@ -20,6 +21,7 @@ const TemplateWrapper = ({ children }) => (
     <LandingPage />
     <Services />
     <Heros />
+    <Teams />
   </div>
 )
 
